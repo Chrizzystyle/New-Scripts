@@ -1,6 +1,15 @@
 local QBX = exports.qbx_core
 local zipTiedPlayers = {}
 
+-- Function to sync zip tied players to all clients
+local function syncZipTiedPlayers()
+    local simplifiedData = {}
+    for playerId, _ in pairs(zipTiedPlayers) do
+        simplifiedData[playerId] = true
+    end
+    TriggerClientEvent('qbx_zipties:client:syncZipTiedPlayers', -1, simplifiedData)
+end
+
 -- Function to check if player has zip ties
 local function hasZipTies(source)
     return exports.ox_inventory:Search(source, 'count', Config.ZipTieItem) > 0
@@ -63,6 +72,7 @@ RegisterNetEvent('qbx_zipties:server:applyZipTies', function(targetId)
     }
     
     TriggerClientEvent('qbx_zipties:client:setZipTied', target, true, src)
+    syncZipTiedPlayers()
     
     -- Log the action
     local srcPlayer = QBX:GetPlayer(src)
@@ -108,6 +118,7 @@ RegisterNetEvent('qbx_zipties:server:removeZipTies', function(targetId)
     -- Remove zip ties
     zipTiedPlayers[target] = nil
     TriggerClientEvent('qbx_zipties:client:setZipTied', target, false, nil)
+    syncZipTiedPlayers()
     
     -- Log the action
     local srcPlayer = QBX:GetPlayer(src)
@@ -142,7 +153,18 @@ AddEventHandler('playerDropped', function(reason)
     local src = source
     if zipTiedPlayers[src] then
         zipTiedPlayers[src] = nil
+        syncZipTiedPlayers()
     end
+end)
+
+-- Send zip tied players list when player joins
+AddEventHandler('playerJoining', function()
+    local src = source
+    local simplifiedData = {}
+    for playerId, _ in pairs(zipTiedPlayers) do
+        simplifiedData[playerId] = true
+    end
+    TriggerClientEvent('qbx_zipties:client:syncZipTiedPlayers', src, simplifiedData)
 end)
 
 -- Export functions
@@ -158,6 +180,7 @@ exports('removeZipTies', function(playerId)
     if zipTiedPlayers[playerId] then
         zipTiedPlayers[playerId] = nil
         TriggerClientEvent('qbx_zipties:client:setZipTied', playerId, false, nil)
+        syncZipTiedPlayers()
         return true
     end
     return false
