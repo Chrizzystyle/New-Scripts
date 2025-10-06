@@ -1,0 +1,207 @@
+# Gun Rack Script for FiveM
+
+A comprehensive vehicle gun rack system for police vehicles in FiveM using QBX Core and ox_inventory.
+
+## Features
+
+- 🚔 Police-only access to vehicle gun racks
+- 🔒 Rank-based access control (optional)
+- 📦 Persistent storage tied to vehicle plates
+- 🎯 Automatic vehicle detection (in vehicle or nearby)
+- 🔧 Pre-registration system for permanent police vehicles
+- 📝 Default items configuration for new gun racks
+- 🐛 Built-in debug mode for troubleshooting
+- 🔄 Manual integration with radial menus via exports
+
+## Dependencies
+
+**Required:**
+- [qbx_core](https://github.com/Qbox-project/qbx_core) - QBX Core framework
+- [ox_lib](https://github.com/overextended/ox_lib) - UI notifications and utilities
+- [ox_inventory](https://github.com/overextended/ox_inventory) - Inventory system
+
+## Installation
+
+1. Download and extract the script to your server's `resources` folder
+2. Ensure the required dependencies are installed and started **before** this script
+3. Add to your `server.cfg`:
+```cfg
+ensure qbx_core
+ensure ox_lib
+ensure ox_inventory
+ensure your-gunrack-resource-name
+```
+
+## Configuration
+
+### Police Jobs
+Configure which jobs can access gun racks:
+```lua
+Config.PoliceJobs = {
+    'police',
+    'sheriff',
+    'statepolice',
+    'lspd',
+    'bcso',
+    'sasp'
+}
+```
+
+### Police Vehicles
+Define which vehicle models have gun racks:
+```lua
+Config.PoliceVehicles = {
+    'nkstx',
+    'nkcypher',
+    'nkballer7',
+    'nkbuffalos',
+    'nkcruiser',
+    'nkdominator',
+    'nkpanto',
+}
+```
+
+### Rank Requirements
+Enable rank-based access control:
+```lua
+Config.RequireMinimumRank = false -- Set to true to enable
+Config.MinimumRanks = {
+    ['police'] = 0,     -- Minimum grade level for police
+    ['sheriff'] = 1,    
+    ['statepolice'] = 1 
+}
+```
+
+### Storage Settings
+```lua
+Config.MaxSlots = 5        -- Maximum inventory slots
+Config.MaxWeight = 10000   -- Maximum weight (in grams)
+Config.DetectionDistance = 2.0  -- Distance to detect vehicles
+Config.AccessDistance = 2.0     -- Distance to access gun rack
+```
+
+### Default Items
+Add default items to new gun racks (optional):
+```lua
+Config.DefaultItems = {
+    {name = 'weapon_pistol', count = 1, metadata = {durability = 100}},
+    {name = 'weapon_nightstick', count = 1},
+    {name = 'weapon_flashlight', count = 1},
+    {name = 'weapon_stungun', count = 1},
+    {name = 'ammo-9', count = 50}
+}
+```
+
+### Pre-Registration (Recommended)
+Pre-register stashes for specific vehicle plates to ensure persistence:
+```lua
+Config.PreRegisterStashes = {
+    {plate = 'POLICE1', model = 'Police Cruiser'},
+    {plate = 'POLICE2', model = 'Police SUV'},
+    {plate = 'SHERIFF1', model = 'Sheriff Cruiser'},
+    {plate = 'BCSO01', model = 'Sheriff SUV'},
+}
+```
+
+### Debug Mode
+Enable detailed logging for troubleshooting:
+```lua
+Config.Debug = false -- Set to true to enable debug logging
+```
+
+## Usage
+
+### In-Game Commands
+
+- `/gunrack` - Access the gun rack (default keybind: F6)
+- `F6` - Default keybind to access gun rack
+
+### Debug Commands (when Config.Debug = true)
+
+**Client-side:**
+- `/gunrack_debug` - Display detailed debug information
+- `/test_gunrack_job` - Test job and rank requirements
+- `/gunrack_refresh` - Shows integration info
+
+**Server-side (console only):**
+- `gunrack_server_debug` - Display server-side debug info
+- `gunrack_list_stashes` - List all registered stashes
+- `gunrack_clear_cache` - Clear stash registration cache
+
+## Integration with Radial Menus
+
+This script provides exports for manual integration with radial menu systems:
+
+### Export Functions
+
+```lua
+-- Get radial menu item configuration
+local gunRackItem = exports['your-gunrack-resource-name']:GetGunRackRadialItem()
+
+-- Check if player can access gun rack
+local canAccess = exports['your-gunrack-resource-name']:CanAccessGunRack()
+
+-- Manually trigger gun rack access
+exports['your-gunrack-resource-name']:AccessGunRack()
+```
+
+### Example Integration
+
+Add to your radial menu configuration:
+```lua
+-- In your radial menu script
+local gunRackItem = exports['your-gunrack-resource-name']:GetGunRackRadialItem()
+-- Add gunRackItem to your police job radial menu
+```
+
+## How It Works
+
+1. **Access Check**: Player must be in a police job and meet minimum rank (if enabled)
+2. **Vehicle Detection**: Script detects if player is in or near a police vehicle
+3. **Stash Creation**: Creates a unique stash ID based on the vehicle's license plate
+4. **Persistence**: Items are saved to the database via ox_inventory
+5. **Pre-Registration**: Configured vehicles have their stashes registered on server start
+
+## Troubleshooting
+
+### Items Disappearing
+- Enable `Config.Debug = true` and check console logs
+- Use `Config.PreRegisterStashes` to pre-register important vehicle plates
+- Ensure ox_inventory is properly configured and saving data
+
+### Can't Access Gun Rack
+- Check you're in a police job listed in `Config.PoliceJobs`
+- Verify vehicle model is in `Config.PoliceVehicles`
+- Check rank requirements if `Config.RequireMinimumRank` is enabled
+- Use `/gunrack_debug` for detailed information
+
+### Vehicle Not Detected
+- Increase `Config.DetectionDistance` and `Config.AccessDistance`
+- Ensure vehicle model name matches exactly (case-insensitive)
+- Check debug logs to see actual vehicle model names
+
+### Stash Not Opening
+- Verify ox_inventory is running before this script
+- Check server console for ox_inventory errors
+- Use server command `gunrack_server_debug` to check stash registration
+
+## Performance Notes
+
+- Stashes are registered on-demand or at server start (if pre-registered)
+- Periodic save thread runs every 5 minutes
+- Vehicle detection uses native game functions for efficiency
+- Debug mode adds minimal overhead but should be disabled in production
+
+## Support
+
+If you encounter issues:
+1. Enable `Config.Debug = true`
+2. Use the debug commands to gather information
+3. Check both client and server console logs
+4. Verify all dependencies are up to date
+
+
+## Credits
+@GamerGarry for help with some of the intergrations he did
+
+Created for QBX Framework with ox_inventory integration

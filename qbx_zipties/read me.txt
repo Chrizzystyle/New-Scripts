@@ -1,0 +1,34 @@
+-- Add these to your ox_inventory items table or items.lua file
+
+INSERT INTO `items` (`name`, `label`, `weight`, `rare`, `can_remove`, `type`, `useable`, `shouldClose`, `combinable`, `description`) VALUES
+('ziptie', 'Zip Tie', 50, 0, 1, 'item', 0, 1, NULL, 'A plastic zip tie used for restraining people'),
+('bolt_cutter', 'Bolt Cutter', 500, 0, 1, 'item', 0, 1, NULL, 'Heavy duty bolt cutters for cutting through metal and plastic restraints');
+
+-- If using items.lua format instead of SQL:
+--[[
+['ziptie'] = {
+    ['name'] = 'ziptie',
+    ['label'] = 'Zip Tie',
+    ['weight'] = 50,
+    ['type'] = 'item',
+    ['image'] = 'ziptie.png',
+    ['unique'] = false,
+    ['useable'] = false,
+    ['shouldClose'] = true,
+    ['combinable'] = nil,
+    ['description'] = 'A plastic zip tie used for restraining people'
+},
+
+['bolt_cutter'] = {
+    ['name'] = 'bolt_cutter',
+    ['label'] = 'Bolt Cutter',
+    ['weight'] = 500,
+    ['type'] = 'item',
+    ['image'] = 'bolt_cutter.png',
+    ['unique'] = false,
+    ['useable'] = false,
+    ['shouldClose'] = true,
+    ['combinable'] = nil,
+    ['description'] = 'Heavy duty bolt cutters for cutting through metal and plastic restraints'
+},
+--]]

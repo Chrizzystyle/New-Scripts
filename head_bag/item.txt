@@ -1,0 +1,8 @@
+-- Add this to your ox_inventory items.lua file
+['head_bag'] = {
+    label = 'Head Bag',
+    weight = 100,
+    stack = true,
+    close = true,
+    description = 'A bag used to blindfold people'
+}

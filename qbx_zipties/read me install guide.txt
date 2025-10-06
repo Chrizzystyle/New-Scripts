@@ -1,0 +1,197 @@
+# QBX Zip Ties Script
+
+A comprehensive zip tie script for FiveM servers using QBX Core framework with ox_lib, ox_inventory, and ox_target integration.
+
+## Features
+
+- **Realistic zip tie mechanics** - Apply and remove zip ties on players
+- **Police integration** - Only police can cut zip ties
+- **ox_target integration** - Easy-to-use targeting system
+- **Progressive animations** - Smooth animations during application/removal
+- **Inventory integration** - Uses ox_inventory for item management
+- **Sound effects** - Audio feedback for actions
+- **Export functions** - Easy integration with other scripts
+
+## Installation
+
+### 1. Resource Setup
+1. Create a new folder called `qbx_zipties` in your resources directory
+2. Copy all the script files into this folder:
+   - `fxmanifest.lua`
+   - `config.lua`
+   - `client/main.lua`
+   - `server/main.lua`
+
+### 2. Database Setup
+Add the zip tie item to your items system:
+
+**For SQL-based inventories:**
+```sql
+INSERT INTO `items` (`name`, `label`, `weight`, `rare`, `can_remove`, `type`, `useable`, `shouldClose`, `combinable`, `description`) VALUES
+('ziptie', 'Zip Tie', 50, 0, 1, 'item', 0, 1, NULL, 'A plastic zip tie used for restraining people'),
+('bolt_cutter', 'Bolt Cutter', 500, 0, 1, 'item', 0, 1, NULL, 'Heavy duty bolt cutters for cutting through metal and plastic restraints');
+```
+
+**For items.lua based systems:**
+```lua
+['ziptie'] = {
+    ['name'] = 'ziptie',
+    ['label'] = 'Zip Tie',
+    ['weight'] = 50,
+    ['type'] = 'item',
+    ['image'] = 'ziptie.png',
+    ['unique'] = false,
+    ['useable'] = false,
+    ['shouldClose'] = true,
+    ['combinable'] = nil,
+    ['description'] = 'A plastic zip tie used for restraining people'
+},
+
+['bolt_cutter'] = {
+    ['name'] = 'bolt_cutter',
+    ['label'] = 'Bolt Cutter',
+    ['weight'] = 500,
+    ['type'] = 'item',
+    ['image'] = 'bolt_cutter.png',
+    ['unique'] = false,
+    ['useable'] = false,
+    ['shouldClose'] = true,
+    ['combinable'] = nil,
+    ['description'] = 'Heavy duty bolt cutters for cutting through metal and plastic restraints'
+},
+```
+
+### 3. Image Setup
+1. Save the provided zip tie image as `ziptie.png`
+2. You'll also need a bolt cutter image saved as `bolt_cutter.png`
+3. Place both images in your inventory images folder (usually `ox_inventory/web/images/`)
+
+### 4. Server Configuration
+1. Add `ensure qbx_zipties` to your server.cfg
+2. Configure the script in `config.lua` if needed
+3. Restart your server
+
+## Usage
+
+### For Players
+1. **Applying Zip Ties:**
+   - Have zip ties in your inventory
+   - Use ox_target on another player
+   - Select "Apply Zip Ties"
+   - Wait for the animation to complete
+
+2. **Effects when Zip Tied:**
+   - Cannot move freely
+   - Cannot attack or use weapons
+   - Cannot exit vehicles
+   - Restricted controls until released
+
+### For Police
+1. **Cutting Zip Ties:**
+   - Use ox_target on a zip-tied player
+   - Select "Cut Zip Ties"
+   - Wait for the cutting animation
+   - **Note:** Police can cut zip ties without any tools
+
+### For Civilians with Bolt Cutters
+1. **Cutting Zip Ties:**
+   - Have bolt cutters in your inventory
+   - Use ox_target on a zip-tied player
+   - Select "Cut Zip Ties"
+   - Wait for the cutting animation (takes longer than police)
+   - **Note:** Bolt cutters will be consumed after use
+
+## Configuration
+
+Edit `config.lua` to customize:
+
+```lua
+-- Item name for zip ties
+Config.ZipTieItem = 'ziptie'
+
+-- Maximum interaction distance
+Config.MaxDistance = 2.0
+
+-- Police jobs that can cut zip ties without tools
+Config.PoliceJobs = {
+    'police',
+    'sheriff',
+    'statepolice'
+}
+
+-- Item name for bolt cutters
+Config.BoltCutterItem = 'bolt_cutter'
+
+-- Animation settings
+Config.Animation = {
+    dict = 'mp_arresting',
+    anim = 'a_uncuff',
+    time = 5000
+}
+```
+
+## Export Functions
+
+### Client Exports
+```lua
+-- Check if local player is zip tied
+local isZipTied = exports.qbx_zipties:isZipTied()
+
+-- Get who zip tied the player
+local zipTiedBy = exports.qbx_zipties:getZipTiedBy()
+```
+
+### Server Exports
+```lua
+-- Check if a player is zip tied
+local isZipTied = exports.qbx_zipties:isPlayerZipTied(playerId)
+
+-- Get zip tie information
+local zipTieInfo = exports.qbx_zipties:getZipTieInfo(playerId)
+
+-- Remove zip ties from a player
+local success = exports.qbx_zipties:removeZipTies(playerId)
+```
+
+## Dependencies
+
+- QBX Core
+- ox_lib
+- ox_inventory
+- ox_target
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"No zip ties" error when you have them:**
+   - Check item name matches in config and database
+   - Ensure ox_inventory is working properly
+
+2. **Animations not playing:**
+   - Verify animation dictionary is loaded
+   - Check ox_lib progress bar is working
+
+3. **Target options not showing:**
+   - Ensure ox_target is running
+   - Check distance settings in config
+
+4. **Police can't cut ties:**
+   - Verify job names in Config.PoliceJobs
+   - Check player job data structure
+
+### Getting Help
+
+If you encounter issues:
+1. Check server console for errors
+2. Verify all dependencies are installed
+3. Check that resource is starting properly
+4. Ensure database item was added correctly
+
+## Credits
+
+Created for QBX Core servers with modern FiveM frameworks integration.
+
+## License
+
+This script is provided as-is for educational and server development purposes.
