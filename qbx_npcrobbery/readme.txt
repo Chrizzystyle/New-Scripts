@@ -1,0 +1,225 @@
+# QBX NPC Robbery System
+
+A comprehensive NPC robbery system for QBX/QBCore servers with ox_inventory support.
+
+## Features
+
+- ✅ **25% Random Robbery Chance** - NPCs randomly attempt to rob players
+- ✅ **30 Second Catch Window** - Players have time to catch and neutralize the robber
+- ✅ **Knife Threat System** - Robbers pull out a knife and demand compliance
+- ✅ **10 Second Warning** - Players have 10 seconds to put their hands up or face consequences
+- ✅ **Stab Mechanic** - Non-compliant players get stabbed and downed
+- ✅ **Ox_Inventory Integration** - Fully compatible with ox_inventory
+- ✅ **Customizable Item List** - Easy configuration of stealable items
+- ✅ **Admin Test Command** - `/testrobbery` to test the system
+- ✅ **Blip System** - Shows robber location on the map
+- ✅ **Cash Robbery** - Steals between $50-$500 cash
+- ✅ **Hands Up System** - Press X to comply with robber demands
+
+## Installation
+
+1. Download or create a folder called `qbx_npcrobbery` in your resources directory
+2. Copy the following files into the folder:
+   - `server.lua`
+   - `client.lua`
+   - `fxmanifest.lua`
+3. Add `ensure qbx_npcrobbery` to your `server.cfg`
+4. Restart your server
+
+## File Structure
+
+```
+qbx_npcrobbery/
+├── server.lua
+├── client.lua
+├── fxmanifest.lua
+└── README.md
+```
+
+## Configuration
+
+### Server-Side Configuration (server.lua)
+
+Edit the `Config` table at the top of `server.lua`:
+
+```lua
+local Config = {
+    RobberyChance = 25, -- 25% chance to be robbed (1-100)
+    RobberyTimeout = 30000, -- 30 seconds to catch the NPC (in milliseconds)
+    StabTimeout = 10000, -- 10 seconds to put hands up (in milliseconds)
+    RobberyDistance = 50.0, -- Distance NPC will run before despawning
+    
+    -- Items that can be robbed (customize this list)
+    RobbableItems = {
+        'money', -- Cash
+        'phone',
+        'wallet',
+        'watch',
+        'chain',
+        'ring',
+        -- Add more items here as needed
+    },
+    
+    -- Cash robbery amounts
+    MinCashAmount = 50,
+    MaxCashAmount = 500,
+}
+```
+
+### Client-Side Configuration (client.lua)
+
+Edit the `Config` table at the top of `client.lua`:
+
+```lua
+local Config = {
+    StabTimeout = 10000, -- 10 seconds to put hands up
+    RobberyTimeout = 30000, -- 30 seconds to catch NPC
+    NPCModels = {
+        'a_m_m_skater_01',
+        'a_m_y_skater_01',
+        'a_m_y_skater_02',
+        'a_m_m_beach_01',
+        'a_m_y_street_01',
+        'a_m_y_street_02',
+        'a_m_m_afriamer_01',
+        'a_m_y_downtown_01',
+    }
+}
+```
+
+## How It Works
+
+### Player Perspective
+
+1. While walking around, there's a 25% chance an NPC will attempt to rob you
+2. The robber spawns nearby and pulls out a knife
+3. A red blip appears on your map showing the robber's location
+4. You have **two options**:
+   - **Put hands up** (Press X) - The robber will take your items and run away
+   - **Fight/Run** - Try to catch and down the robber within 30 seconds
+
+### Outcomes
+
+- **If you put hands up**: Robber takes items and flees (you keep your health)
+- **If you don't comply**: Robber stabs you, takes items, and you get downed
+- **If you catch the robber**: You stop the robbery and keep your items
+- **If time runs out**: Robber escapes with no robbery
+
+## Commands
+
+### Admin Commands
+
+- `/testrobbery` - Forces a robbery attempt (Admin only)
+ `/forcerobbery` - Forces a robbery attempt (Admin only)
+  - Requires 'admin' permission
+  - Useful for testing the system
+
+### Player Commands
+
+- **X Key** (default) - Put hands up during robbery
+  - Can be changed in FiveM keybinds settings
+  - Look for "Put Hands Up" binding
+
+## Customization Tips
+
+### Adding More Robbable Items
+
+In `server.lua`, add items to the `RobbableItems` table:
+
+```lua
+RobbableItems = {
+    'money',
+    'phone',
+    'wallet',
+    'watch',
+    'chain',
+    'ring',
+    'gold_bar',      -- Add custom items
+    'diamond',       -- Add custom items
+    'rolex',         -- Add custom items
+},
+```
+
+### Changing Robbery Frequency
+
+Adjust the `RobberyChance` value in `server.lua`:
+
+```lua
+RobberyChance = 10, -- 10% chance (less frequent)
+RobberyChance = 50, -- 50% chance (more frequent)
+```
+
+### Changing Time Limits
+
+Adjust the timeout values in both files:
+
+```lua
+RobberyTimeout = 45000, -- 45 seconds to catch robber
+StabTimeout = 15000, -- 15 seconds to comply
+```
+
+### Adding Different NPC Models
+
+In `client.lua`, add more models to the `NPCModels` table:
+
+```lua
+NPCModels = {
+    'a_m_m_skater_01',
+    'a_m_y_skater_01',
+    'g_m_m_armboss_01',      -- Add gang members
+    'g_m_m_armgoon_01',      -- Add gang members
+    'a_m_y_mexthug_01',      -- Add thugs
+},
+```
+
+## Dependencies
+
+- **QBX Core** or **QBCore** - Core framework
+- **ox_inventory** - Inventory system
+- **ox_lib** - Library functions
+
+## Troubleshooting
+
+### Robberies Not Triggering
+
+1. Check that the resource is started: `ensure qbx_npcrobbery` in server.cfg
+2. Use `/testrobbery` command to force a test
+3. Check server console for errors
+
+### Items Not Being Stolen
+
+1. Verify item names match your ox_inventory items exactly
+2. Check that items exist in the player's inventory
+3. Ensure ox_inventory exports are working
+
+### NPC Not Spawning
+
+1. Check client console (F8) for errors
+2. Verify NPC models are valid
+3. Try using `/testrobbery` to isolate the issue
+
+### Hands Up Not Working
+
+1. Remap the keybind in FiveM settings
+2. Check if another resource is conflicting with the X key
+3. Animation dictionary may need to be loaded
+
+## Support
+
+For issues or questions, check:
+- QBX Documentation
+- ox_inventory Documentation
+- FiveM Forums
+
+## License
+
+This script is open source and free to use/modify for your server.
+
+## Credits
+
+Created for QBX/QBCore servers with ox_inventory support.
+
+---
+
+**Version:** 1.0.0  
+**Last Updated:** 2025
